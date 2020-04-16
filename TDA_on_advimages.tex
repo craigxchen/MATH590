@@ -60,6 +60,8 @@
 
 \usepackage{hyperref} % For hyperlinks in the PDF
 
+\usepackage{graphicx} % For importing images
+
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION
 %----------------------------------------------------------------------------------------
@@ -128,26 +130,20 @@ Text requiring further explanation\footnote{Example footnote}.
 
 \section{Methods}
 
+\subsection{Adversarial Noise}
 \blindtext % Dummy text
+
+\subsection{Targeted Attacks}
 
 %------------------------------------------------
 
 \section{Results}
 
-\begin{table}
-\caption{Example table}
-\centering
-\begin{tabular}{llr}
-\toprule
-\multicolumn{2}{c}{Name} \\
-\cmidrule(r){1-2}
-First name & Last Name & Grade \\
-\midrule
-John & Doe & $7.5$ \\
-Richard & Miles & $2$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{figure}
+	\centering
+	\caption{TEST (Persistence Diagram of adversarial image that classifies as 6 but mimicking 3)}
+	\includegraphics[scale=0.5]{figures/persdgm_adversarial3.eps}
+\end{figure}
 
 \blindtext % Dummy text
 
