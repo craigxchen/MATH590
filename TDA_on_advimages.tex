@@ -61,6 +61,7 @@
 \usepackage{hyperref} % For hyperlinks in the PDF
 
 \usepackage{graphicx} % For importing images
+\usepackage{subfig}
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION
@@ -137,13 +138,23 @@ Text requiring further explanation\footnote{Example footnote}.
 
 %------------------------------------------------
 
+\begin{figure*}[t!]
+	\centering
+	\subfloat[Persistence Diagram of the adversarial image]{
+	\includegraphics[scale=0.5]{figures/persdgm_adversarial3.eps}}
+	\subfloat[Adversarial Image, results in classification as 6]{
+	\includegraphics[scale=0.5]{figures/adversarial3.eps}}
+	\\
+	\subfloat[Persistence Diagram of the mimic image]{
+	\includegraphics[scale=0.5]{figures/persdgm_mimic3.eps}}
+	\subfloat[Mimic Image]{
+	\includegraphics[scale=0.5]{figures/mimic3.eps}}
+	\caption{a) TEST b) TEST}
+\end{figure*}
+
 \section{Results}
 
-\begin{figure}
-	\centering
-	\caption{TEST (Persistence Diagram of adversarial image that classifies as 6 but mimicking 3)}
-	\includegraphics[scale=0.5]{figures/persdgm_adversarial3.eps}
-\end{figure}
+
 
 \blindtext % Dummy text
 
