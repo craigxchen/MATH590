@@ -11,6 +11,7 @@ from persim import plot_diagrams
 MIMIC = 3
 TARGET = 6
 MAXDIM = 1
+SIGMA = np.sqrt(0.05)
 
 with open('network/trained_network.pkl', 'rb') as f:
     u = pickle._Unpickler(f)
@@ -149,6 +150,11 @@ def sneaky_generate(n, m):
 adv_ex, orig = sneaky_generate(TARGET, MIMIC)
 adv_ex = adv_ex.reshape(28,28)
 orig = orig.reshape(28,28)
+noisy_orig = SIGMA*np.random.randn(28,28) + orig
+
+plt.figure()
+plt.imshow(noisy_orig, cmap='Greys')
+plt.show()
 
 adv_pc = []
 for u in range(28):
@@ -171,25 +177,43 @@ target_pc = []
 for u in range(28):
     for v in range(28):
         target_pc.append((u/28,v/28,test_data[idx].reshape(28,28)[u][v]))
-
-print("Homology of Adversarial Example: ")
-
-adv_dgms = ripser(np.array(adv_pc),maxdim=MAXDIM)['dgms']
-
-plt.figure()
-plot_diagrams(adv_dgms)
-#plot_diagrams(adv_dgms, plot_only=[0], ax=plt.subplot(121))
-#plot_diagrams(adv_dgms, plot_only=[1], ax=plt.subplot(122))
-plt.show()
+        
+noisy_pc = []
+for u in range(28):
+    for v in range(28):
+        noisy_pc.append((u/28,v/28,noisy_orig[u][v]))
 
 print("Homology of Mimic Example: ")
 
 orig_dgms = ripser(np.array(orig_pc),maxdim=MAXDIM)['dgms']
 
 plt.figure()
+#plt.title("Homology of Mimic Example")
 plot_diagrams(orig_dgms)
 #plot_diagrams(orig_dgms, plot_only=[0], ax=plt.subplot(121))
 #plot_diagrams(orig_dgms, plot_only=[1], ax=plt.subplot(122))
+plt.show()
+
+print("Homology of Adversarial Example: ")
+
+adv_dgms = ripser(np.array(adv_pc),maxdim=MAXDIM)['dgms']
+
+plt.figure()
+#plt.title("Homology of Adversarial Example")
+plot_diagrams(adv_dgms)
+#plot_diagrams(adv_dgms, plot_only=[0], ax=plt.subplot(121))
+#plot_diagrams(adv_dgms, plot_only=[1], ax=plt.subplot(122))
+plt.show()
+
+print("Homology of Gaussian noise added: ")
+
+noisy_dgms = ripser(np.array(noisy_pc),maxdim=MAXDIM)['dgms']
+
+plt.figure()
+#plt.title("Homology of Mimic with Gaussian Noise")
+plot_diagrams(noisy_dgms)
+#plot_diagrams(noisy_dgms, plot_only=[0], ax=plt.subplot(121))
+#plot_diagrams(noisy_dgms, plot_only=[1], ax=plt.subplot(122))
 plt.show()
 
 print("Homology of Target: ")
@@ -197,6 +221,7 @@ print("Homology of Target: ")
 tgt_dgms = ripser(np.array(target_pc),maxdim=MAXDIM)['dgms']
 
 plt.figure()
+plt.title("Homology of Target Example")
 plot_diagrams(tgt_dgms)
 #plot_diagrams(tgt_dgms, plot_only=[0], ax=plt.subplot(121))
 #plot_diagrams(tgt_dgms, plot_only=[1], ax=plt.subplot(122))
