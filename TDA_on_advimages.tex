@@ -71,7 +71,7 @@
 
 \pretitle{\begin{center}\Huge\bfseries} % Article title formatting
 \posttitle{\end{center}} % Article title closing formatting
-\title{Article Title} % Article title
+\title{\LARGE Persistent Homology Analysis of Adversarial Images} % Article title
 \author{%
 \textsc{Edric Tam}\\[1ex] % Your name
 \normalsize Duke University \\ % Your institution
@@ -111,17 +111,8 @@
 \section{Preliminaries and Background}
 
 \subsection{Generating Adversarial Images}
-Maecenas sed ultricies felis. Sed imperdiet dictum arcu a egestas. 
-\begin{itemize}
-\item Donec dolor arcu, rutrum id molestie in, viverra sed diam
-\item Curabitur feugiat
-\item turpis sed auctor facilisis
-\item arcu eros accumsan lorem, at posuere mi diam sit amet tortor
-\item Fusce fermentum, mi sit amet euismod rutrum
-\item sem lorem molestie diam, iaculis aliquet sapien tortor non nisi
-\item Pellentesque bibendum pretium aliquet
-\end{itemize}
-\blindtext % Dummy text
+
+There are multiple ways to generate adversarial images for neural networks, recent work has shown that even 1-pixel changes can be sufficient to deceive machine learning models. In this paper, we stick to the basics and use two related techniques: the Fast Gradient Sign Method \cite{goodfellow2014} and the similar gradient-based optimization approach \cite{szegedy2013}.
 
 Text requiring further explanation\footnote{Example footnote}.
 
@@ -186,11 +177,18 @@ A statement requiring citation \cite{Figueredo:2009dg}.
 
 \begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
 
-\bibitem[Figueredo and Wolf, 2009]{Figueredo:2009dg}
-Figueredo, A.~J. and Wolf, P. S.~A. (2009).
-\newblock Assortative pairing and life history strategy - a cross-cultural
-  study.
-\newblock {\em Human Nature}, 20:317--330.
+\bibitem[1]{goodfellow2014}
+Goodfellow et al.
+\newblock Explaining and Harnessing Adversarial Examples. 2014.
+\newblock {\em International Conference on Learning Representations}, https://arxiv.org/abs/1412.6572
+
+\bibitem[2]{szegedy2013}
+Szegedy, Christian et al.
+\newblock Intriguing properties of neural networks. 2013.
+\newblock {\em International Conference on Learning Representations}, http://arxiv.org/abs/1312.6199
+ 
+
+ 
  
 \end{thebibliography}
 
