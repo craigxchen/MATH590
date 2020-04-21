@@ -1,24 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Journal Article
-% LaTeX Template
-% Version 1.4 (15/5/16)
-%
-% This template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% Original author:
-% Frits Wenneker (http://www.howtotex.com) with extensive modifications by
-% Vel (vel@LaTeXTemplates.com)
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
-
 \documentclass[twoside,twocolumn]{article}
 
 \usepackage{blindtext} % Package to generate dummy text throughout this template 
@@ -35,7 +14,7 @@
 \usepackage{booktabs} % Horizontal rules in tables
 
 \usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
-
+\usepackage{todonotes}
 \usepackage{enumitem} % Customized lists
 \setlist[itemize]{noitemsep} % Make itemize lists more compact
 
@@ -53,7 +32,7 @@
 \pagestyle{fancy} % All pages have headers and footers
 \fancyhead{} % Blank out the default header
 \fancyfoot{} % Blank out the default footer
-\fancyhead[C]{Running title $\bullet$ May 2016 $\bullet$ Vol. XXI, No. 1} % Custom header text
+\fancyhead[C]{Persistent Homology of Adversarial Images} % Custom header text
 \fancyfoot[RO,LE]{\thepage} % Custom footer text
 
 \usepackage{titling} % Customizing the title section
@@ -69,9 +48,9 @@
 
 \setlength{\droptitle}{-4\baselineskip} % Move the title up
 
-\pretitle{\begin{center}\Huge\bfseries} % Article title formatting
-\posttitle{\end{center}} % Article title closing formatting
-\title{\LARGE Persistent Homology Analysis of Adversarial Images} % Article title
+% \pretitle{\begin{center}\Huge\bfseries} % Article title formatting
+% \posttitle{\end{center}} % Article title closing formatting
+\title{\LARGE Persistent Homology of Adversarial Images} % Article title
 \author{%
 \textsc{Edric Tam}\\[1ex] % Your name
 \normalsize Duke University \\ % Your institution
@@ -102,32 +81,55 @@ It is now known that even the most well-trained and generalizable image-classifi
 
 \section{Introduction}
 
-\lettrine[nindent=0em,lines=3]{L} orem ipsum dolor sit amet, consectetur adipiscing elit.
-\blindtext % Dummy text
+\lettrine[nindent=0em,lines=3]{D} eep learning is a rapidly developing area of machine learning that has made huge changes to how technology affects our daily lives. From image classification to computer vision, reinforcement learning to natural langauge processing, deep neural networks have achieved state-of-the-art performances that far exceeds that of other machine learning models, sometimes even surpassing humans in accuracy and speed on these tasks. These advancements have led to very wide adoption in industrial applications, e.g. logging in via face recognition on mobile phones, using fingerprints to authenticate users to applications etc. This means that the security aspect of these Deep Learning algorithms, traditionally an under-studied subject, is crucial to ensure that the privacy and safety of the billions of users using these technologies. 
 
-\blindtext % Dummy text
+It is now known that even the most well-trained and generalizable image-classification neural network models can succumb to adversarial attacks. To the human eye, the adversarial image may be indistinguishable from the original, but to the machine learning model, they are of two different classes. Existing research shows that the existence of adversarial examples are not specific to neural networks in the image classification settings. Adversarial examples also exist in many kernel-based machine learning methods such as support vector machines, and manifest themselves in applications with text data, language data etc. However, due to the visual nature of image classification tasks, we have adopted the standard MNIST benchmark for our experiments to better illustrate the concepts underlying this paper. However, note that similar extensions to other machine learning models involve images should be straightforward. 
+
+We mainly conduct our experiments through the lens of computational topology. In particular, we have focused our analysis mainly on zero and one dimensional persistence diagrams of the original/adversarial images as well as the noises that have been added. We compare the topological structure of these adversarial noises against those that arise from more natural distributions, such as the Gaussian. Our results show that not only is there visually discernible differences in the patterns that arise in natural vs adversarial noises, but we also see via statistical testing that these differences could potentially be discerned by appropriate statistical models.
+
+We hope that this report would illuminate future work in similar directions. 
+
+Below, in section 2, we outline the prerequisite background knowledge in adversarial images as well as persistent homology needed for understanding the paper. In section 3, we outline the methods that we adopted in our experiments. In section 4, we list our results as well as related figures. In section 5, we discuss the interpretation of these results as well as potential future directions. 
 
 %------------------------------------------------
 
 \section{Preliminaries and Background}
 
-\subsection{Generating Adversarial Images}
+\subsection{Adversarial Images}
 
-There are multiple ways to generate adversarial images for neural networks, recent work has shown that even 1-pixel changes can be sufficient to deceive machine learning models. In this paper, we stick to the basics and use two related techniques: the Fast Gradient Sign Method \cite{goodfellow2014} and the similar gradient-based optimization approach \cite{szegedy2013}.
+Most of the existing mainstream methods in the literature generate adversarial images with 3 input ingredients: 
+\begin{itemize}
+    \item the dataset of original images
+    \item a classifier used to classify those images
+\end{itemize}
+In this paper, the classifier that we will consider will be the classifier that is under-adversarial attack. In other words, we would have "oracle" access to the classifier. Note that in real life settings, attackers generally don't have access to the true classifier. But due to certain intriguing "universality" results, adversarial images generated from one classifer generally works for a wide range of classifiers. Hence, having "oracle" access to the true classifier is not an essential requirement, but we have chosen this setup for simplicity. 
 
-Text requiring further explanation\footnote{Example footnote}.
+There are multiple ways to generate adversarial images for neural networks, and recent work has shown that even 1-pixel changes can be sufficient to deceive machine learning models. In this report, we stick to the basics and use two related techniques: the Fast Gradient Sign Method (FGSM) \cite{goodfellow2014} and the similar gradient-based optimization approach \cite{szegedy2013}.
+
+In the Fast Gradient Sign method, we take an original image, say a "1" in MNIST, and add noise to perturb it so that the classifier would mis-classify it to another pre-specified label, say a "7". This is achieved by taking the gradient of the cost function of the classifier with respect to the input data, and adding it to the original image. The intuition for why this works is as follows: typically, machine learning models aim to minimize a certain loss function in order to maximize classification accuracy. In this FGSM scenario, we are adding the noise in the direction of the gradient that maximizes the loss function, thus causing the mislabeling. 
+
+\todo{Add explanation for szegedy et al method here}
 
 \subsection{Persistent Homology}
 
-%------------------------------------------------
+There are many ways to computationally and visually examine the topology of certain objects/data. For a general treatment, we refer readers to the excellent text by Edelsbrunner and Harer. For this analysis, we will focus on a particular aspect called Persistent Homology, especially in 0-D and 1-D. 
 
+Intuitively, for 0-D persistent homology in Euclidean space, we are primarily focusing on the connected components in the object under examination. The way we achieve that is by "growing balls" around each point in the object, and noting when they "touch"/merge. The "birth"/"death" of these components are tracked through time, and can be presented visually in the form of a persistent diagram. 
+
+We do something very similar for 1-D persistent homology, where we still consider growing balls around each point, except that time time rather than tracking the birth and death of connected components, we track the birth and death of loops instead. 
+
+\todo{expand on these explanations in a more rigrous way, perhaps with some diagrams}
 \section{Methods}
 
+\subsection{Dataset and Setup}
+We have adopted the popular benchmark image classification dataset MNIST for our experiments. It consists of 60000 training images and 10000 testing images. Each of the digits, ranging from 0 to 9, represents one-tenth of the data in the dataset. In general, a very simple feedforward neural network, under relatively little training (e.g. 10 epochs) could achieve a testing accuracy of around 95 percent in this dataset. 
+
 \subsection{Adversarial Noise}
-\blindtext % Dummy text
+We first performed adversarial 
 
 \subsection{Targeted Attacks}
 
+\todo{craig can expand on his experimental methods here}
 %------------------------------------------------
 
 \begin{figure*}[t!]
@@ -154,23 +156,13 @@ Text requiring further explanation\footnote{Example footnote}.
 
 
 
-\blindtext % Dummy text
-
-\begin{equation}
-\label{eq:emc}
-e = mc^2
-\end{equation}
-
-\blindtext % Dummy text
-
 %------------------------------------------------
 
 \section{Conclusion and Discussion}
 
-\subsection{Subsection One}
 
-A statement requiring citation \cite{Figueredo:2009dg}.
-\blindtext % Dummy text
+
+
 
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
