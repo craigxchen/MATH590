@@ -89,13 +89,13 @@ It is now known that even the most well-trained and generalizable image-classifi
 
 \lettrine[nindent=0em,lines=3]{D} eep learning is a rapidly developing area of machine learning that has made huge changes to how technology affects our daily lives. From image classification to computer vision, reinforcement learning to natural langauge processing, deep neural networks have achieved state-of-the-art performances that far exceeds that of other machine learning models, sometimes even surpassing humans in accuracy and speed on these tasks. These advancements have led to very wide adoption in industrial applications, e.g. logging in via face recognition on mobile phones, using fingerprints to authenticate users to applications etc. This means that the security aspect of these Deep Learning algorithms, traditionally an under-studied subject, is crucial to ensure that the privacy and safety of the billions of users using these technologies. 
 
-It is now known that even the most well-trained and generalizable image-classification neural network models can succumb to adversarial attacks. To the human eye, the adversarial image may be indistinguishable from the original, but to the machine learning model, they are of two different classes. Existing research shows that the existence of adversarial examples are not specific to neural networks in the image classification settings. Adversarial examples also exist in many kernel-based machine learning methods such as support vector machines, and manifest themselves in applications with text data, language data etc. However, due to the visual nature of image classification tasks, we have adopted the standard MNIST benchmark for our experiments to better illustrate the concepts underlying this paper. However, note that similar extensions to other machine learning models involve images should be straightforward. 
+It is now known that even the most well-trained and generalizable image-classification neural network models can succumb to adversarial attacks. To the human eye, the adversarial image may be indistinguishable from the original, but to the machine learning model, they are of two different classes. Existing research shows that the existence of adversarial examples are not specific to neural networks in the image classification settings. Adversarial examples also exist in many kernel-based machine learning methods such as support vector machines, and manifest themselves in applications with text data, language data etc. However, due to the visual nature of image classification tasks, we have adopted the standard MNIST benchmark for our experiments to better illustrate the concepts underlying this paper. However, note that similar extensions to other machine learning models involving image recognition should be straightforward. 
 
-We mainly conduct our experiments through the lens of computational topology. In particular, we have focused our analysis mainly on zero and one dimensional persistence diagrams of the original/adversarial images as well as the noises that have been added. We compare the topological structure of these adversarial noises against those that arise from more natural distributions, such as the Gaussian. Our results show that not only is there visually discernible differences in the patterns that arise in natural vs adversarial noises, but we also see via statistical testing that these differences could potentially be discerned by appropriate statistical models.
+We mainly conduct our experiments through the lens of computational topology. In particular, we have focused our analysis on the zero- and one-dimensional persistence diagrams of the original/adversarial images. We also compare the topological structure of these adversarial perturbations against those that arise from more natural distributions, such as the Gaussian. Our results show that not only are there visually discernible differences in the persistence diagrams of natural and adversarial noise, there are also statistical testing methods can potentially capture these differences.
 
 We hope that this report would illuminate future work in similar directions. 
 
-Below, in section 2, we outline the prerequisite background knowledge in adversarial images as well as persistent homology needed for understanding the paper. In section 3, we outline the methods that we adopted in our experiments. In section 4, we list our results as well as related figures. In section 5, we discuss the interpretation of these results as well as potential future directions. 
+In section 2, we outline the prerequisite background knowledge in adversarial images as well as persistent homology needed for understanding the paper. In section 3, we describe the methods that we adopted in our experiments. In section 4, we list our results as well as related figures. In section 5, we discuss the interpretation of these results as well as potential future directions. 
 
 %------------------------------------------------
 
@@ -114,7 +114,7 @@ There are multiple ways to generate adversarial images for neural networks, and 
 
 In the Fast Gradient Sign method, we take an original image, say a "1" in MNIST, and add noise to perturb it so that the classifier would mis-classify it to another pre-specified label, say a "7". This is achieved by taking the gradient of the cost function of the classifier with respect to the input data, and adding it to the original image. The intuition for why this works is as follows: typically, machine learning models aim to minimize a certain loss function in order to maximize classification accuracy. In this FGSM scenario, we are adding the noise in the direction of the gradient that maximizes the loss function, thus causing the mislabeling. 
 
-In the second technique, an adversarial perturbation is generated by running an optimzation algorithm on the \emph{input} vector so that it minimizes a target loss function. In this paper, we perform gradient descent on a randomly initialized input vector with respect to the loss function: 
+In the second technique, an adversarial perturbation is generated by running an optimization algorithm on the \emph{input} vector so that it minimizes a target loss function. In this paper, we perform gradient descent on a randomly initialized input vector with respect to the loss function: 
 $$
 C(x) = \frac{1}{2} \Vert y_{goal} - y(x) \Vert^2
 + \lambda \Vert x_{mimic} - x \Vert^2
@@ -123,13 +123,22 @@ where $x$ is the input vector, $y_{goal}$ is the label output we desire, $x_{mim
 
 \subsection{Persistent Homology}
 
-There are many ways to computationally and visually examine the topology of certain objects/data. For a general treatment, we refer readers to the excellent text by Edelsbrunner and Harer. For this analysis, we will focus on a particular aspect called Persistent Homology, especially in 0-D and 1-D. 
+\begin{figure*}
+    \centering
+    \includegraphics[scale=0.55]{figures/pers_hom_example.jpg}
+    \caption{The gradual thickening of a point cloud in $\mathbb{R}^2$ and the 1-dim Persistence Diagram. \\
+    Figure from https://medium.com/analytics-vidhya/topological-data-analysis-w-scikit-tda-891a201665d8}
+    \label{fig:pers_hom_example}
+\end{figure*}
+
+There are many ways to computationally and visually examine the topology of certain objects/data. For a general treatment, we refer readers to the excellent text by Edelsbrunner and Harer \cite{edelsbrunnerharer}. For this analysis, we will focus on a particular aspect called Persistent Homology, especially in 0-D and 1-D. 
 
 Intuitively, for 0-D persistent homology in Euclidean space, we are primarily focusing on the connected components in the object under examination. The way we achieve that is by "growing balls" around each point in the object, and noting when they "touch"/merge. The "birth"/"death" of these components are tracked through time, and can be presented visually in the form of a persistent diagram. 
 
-We do something very similar for 1-D persistent homology, where we still consider growing balls around each point, except that time time rather than tracking the birth and death of connected components, we track the birth and death of loops instead. 
+We do something very similar for 1-D persistent homology, where we still consider growing balls around each point, except that time time rather than tracking the birth and death of connected components, we track the birth and death of loops instead. For an example of the \v Cech complex of a given point cloud as the radius grows, see Figure \ref{fig:pers_hom_example}. 
 
 \todo{expand on these explanations in a more rigorous way, perhaps with some diagrams}
+
 \section{Methods}
 
 \subsection{Dataset and Setup}
@@ -139,6 +148,8 @@ It is worth noting that the "victim" neural net in our experiments is a fully co
 
 \subsection{Adversarial Noise}
 We first performed adversarial 
+
+\todo{ed}
 
 \subsection{Targeted Attacks}
 
@@ -159,38 +170,60 @@ In constrast to the FGSM, the process of generating a targeted adversarial image
 \end{algorithmic}
 \end{algorithm}
 
+Then, we transform the images into a 3D point cloud where the $x$ and $y$ coordinates correspond to the row and column of the pixel, respectively, and the $z$ value is brightness of the pixel. The $x,y$ values are then normalized so that the point cloud exists inside the unit cube since the brightness values are pre-normalized from the data set. 
+
+This array of points is then inputted into Ripser where the 0 and 1-dim persistent homology is determined via Rips filtration. For an example, see Figure \ref{fig:targetedcomparison}.
+
 %------------------------------------------------
 
-\begin{figure*}[t!]
+\begin{figure*}[!htb]
+    
 	\centering
 	\subfloat[Mimic Image]{
 	\includegraphics[scale=0.5]{figures/mimic3.eps}}
 	\subfloat[Persistence Diagram of the mimic image]{
 	\includegraphics[scale=0.5]{figures/persdgm_mimic3.eps}}
 	\\
+	\vspace{-1.2em}
 	\subfloat[Adversarial Image, results in classification as 6]{
 	\includegraphics[scale=0.5]{figures/adversarial3.eps}}
 	\subfloat[Persistence Diagram of the adversarial image]{
 	\includegraphics[scale=0.5]{figures/persdgm_adversarial3.eps}}
-	\\
-	\subfloat[$(\mu=0,\sigma^2=0.05)$ Gaussian Noise added]{
+	\\ 
+	\vspace{-1.2em}
+	\subfloat[Noisy Image]{
 	\includegraphics[scale=0.5]{figures/noisy3.eps}}
 	\subfloat[Persistence Diagram of the noisy image]{
 	\includegraphics[scale=0.5]{figures/persdgm_noisy3.eps}}
 	
-	\caption{TEST}
+	\caption{Persistence Diagrams of Three Types of Images.\\
+	(a),(b) A "3" from the MNIST dataset and its 0,1-dim persistence diagrams. \\
+	(c),(d) An adversarial image generated using gradient descent on a random input with parameters:\\
+	    \-\hspace{1em} $x_{mimic} = (a), y_{goal} = 6, \lambda = 0.05, \alpha = 0.05, K = 1000$. 
+	\\
+	(e),(f) Image (a) with additive entry-wise N(0,0.05) noise and corresponding persistence diagram.}
+	\label{fig:targetedcomparison}
 \end{figure*}
 
 \section{Results}
 
 From our experiments, we found that
+\todo{add summary of results}
 
+\todo{ed adds paragraph on his work}
+
+Figure \ref{fig:targetedcomparison} depicts the differences between the persistence diagrams the targeted adversarial image and the other classes of images we are interested in. Immediately one notices the clumps of points in the adversarial and noisy 1-D persistence diagrams that are absent in the diagram of the original image. There is also a qualitative difference between the shape of the clumps in the adversarial and noisy images - the clumps appear to be similarly cone-shaped but differ in size. One could imagine that the size of the clumps in the noisy image can be controlled by adjusting the standard deviation of the added noise, and this may in fact be the case. \todo{find references about persistence diagrams of gaussian noise}
+% ^this seems to be true based on my experimentation
+
+Perhaps more interestingly, the persistence diagram of the adversarial image appears to contain more features of the original image whereas the noise-added image appears to have "lost" many features. Here, we use features in a very general sense to discuss the appearance of the 1-D persistence diagrams. This may seem like an obvious difference as during the process of generating the adversarial image there is an incentive to mimic the original image; however, it is not immediately obvious that the inclusion of adversarial perturbations should not alter the 1-D homology of the image.
 
 %------------------------------------------------
 
 \section{Conclusion and Discussion}
 
 Despite yielding some interesting results, our work leaves a lot to be desired. The results may appear compelling to the human eye, but more rigorous methods are needed to determine whether or not there is a significant difference between the persistence diagrams of the adversarial images.
+
+\textbf{Future Work}: It may be interesting to feed the persistence diagrams of the original, adversarial, and noisy images into another machine learning model. It seems likely that there is a classifiable difference between the persistence diagrams yielded by the three types of images. Additionally, the same line of analysis may yield more interesting results when applied to a convolutional neural net, rather than the simple fully-connected net used to produce our results. Furthermore, it is known that the MNIST digits dataset is rather easy for machine learning models to learn. Experiments with more challenging data sets and higher resolution images are a clear way forwards to improve upon our results.
 
 
 
@@ -201,16 +234,19 @@ Despite yielding some interesting results, our work leaves a lot to be desired. 
 \begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
 
 \bibitem[1]{goodfellow2014}
-Goodfellow et al.
+\textbf{Goodfellow et al.}
 \newblock Explaining and Harnessing Adversarial Examples. 2014.
 \newblock {\em International Conference on Learning Representations}, https://arxiv.org/abs/1412.6572
 
 \bibitem[2]{szegedy2013}
-Szegedy et al.
+\textbf{Szegedy et al.}
 \newblock Intriguing properties of neural networks. 2013.
 \newblock {\em International Conference on Learning Representations}, http://arxiv.org/abs/1312.6199
  
-
+\bibitem[3]{edelsbrunnerharer}
+\textbf{Edelsbrunner \& Harer}
+\newblock Computational Topology: An Introduction. 2010.
+\newblock {\em American Mathematical Society}
  
  
 \end{thebibliography}
