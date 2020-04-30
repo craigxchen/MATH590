@@ -47,6 +47,8 @@
 \usepackage{algorithmic} % For pseudocode
 \usepackage{algorithm}
 
+\usepackage{amsmath}
+\DeclareMathOperator{\sign}{sign} 
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION
@@ -87,7 +89,7 @@ It is now known that even the most well-trained and generalizable image-classifi
 
 \section{Introduction}
 
-\lettrine[nindent=0em,lines=3]{D} eep learning is a rapidly developing area of machine learning that has made huge changes to how technology affects our daily lives. From image classification to computer vision, reinforcement learning to natural langauge processing, deep neural networks have achieved state-of-the-art performances that far exceeds that of other machine learning models, sometimes even surpassing humans in accuracy and speed on these tasks. These advancements have led to very wide adoption in industrial applications, e.g. logging in via face recognition on mobile phones, using fingerprints to authenticate users to applications etc. This means that the security aspect of these Deep Learning algorithms, traditionally an under-studied subject, is crucial to ensure that the privacy and safety of the billions of users using these technologies. 
+\lettrine[nindent=0em,lines=3]{D} eep learning is a rapidly developing area of machine learning that has made huge changes to how technology affects our daily lives. From image classification to computer vision, reinforcement learning to natural language processing, deep neural networks have achieved state-of-the-art performances that far exceeds that of other machine learning models, sometimes even surpassing humans in accuracy and speed on these tasks. These advancements have led to very wide adoption in industrial applications, e.g. logging in via face recognition on mobile phones, using fingerprints to authenticate users to applications etc. This means that the security aspect of these Deep Learning algorithms, traditionally an under-studied subject, is crucial to ensure that the privacy and safety of the billions of users using these technologies. 
 
 It is now known that even the most well-trained and generalizable image-classification neural network models can succumb to adversarial attacks. To the human eye, the adversarial image may be indistinguishable from the original, but to the machine learning model, they are of two different classes. Existing research shows that the existence of adversarial examples are not specific to neural networks in the image classification settings. Adversarial examples also exist in many kernel-based machine learning methods such as support vector machines, and manifest themselves in applications with text data, language data etc. However, due to the visual nature of image classification tasks, we have adopted the standard MNIST benchmark for our experiments to better illustrate the concepts underlying this paper. However, note that similar extensions to other machine learning models involving image recognition should be straightforward. 
 
@@ -112,22 +114,25 @@ In this paper, the classifier that we will consider will be a pre-trained neural
 
 There are multiple ways to generate adversarial images for neural networks, and recent work has shown that even 1-pixel changes can be sufficient to deceive machine learning models. In this report, we stick to the basics and use two related techniques: the Fast Gradient Sign Method (FGSM) \cite{goodfellow2014} and the similar gradient-based optimization approach \cite{szegedy2013}.
 
-In the Fast Gradient Sign method, we take an original image, say a "1" in MNIST, and add noise to perturb it so that the classifier would mis-classify it to another pre-specified label, say a "7". This is achieved by taking the gradient of the cost function of the classifier with respect to the input data, and adding it to the original image. The intuition for why this works is as follows: typically, machine learning models aim to minimize a certain loss function in order to maximize classification accuracy. In this FGSM scenario, we are adding the noise in the direction of the gradient that maximizes the loss function, thus causing the mislabeling. 
+In the Fast Gradient Sign method, we take an original image, say a "1" in MNIST, and add noise to perturb it so that the classifier would misclassify it to another label, say a "7". This is achieved by taking the gradient of the cost function of the classifier with respect to the input data, and adding it to the original image. The intuition for why this works is as follows: typically, machine learning models aim to minimize a certain loss function in order to maximize classification accuracy. In this FGSM scenario, we are adding the noise in the direction of the gradient that maximizes the loss function, thus causing the mislabeling. Explicitly, we generate the adversarial image $x'$ as follows:
+$$
+x' = x + \varepsilon \sign (\nabla_x L(x,y))
+$$
+where $x$ is the original input, $y$ is the true label of $x$, and $L$ is the loss function.
 
 In the second technique, an adversarial perturbation is generated by running an optimization algorithm on the \emph{input} vector so that it minimizes a target loss function. In this paper, we perform gradient descent on a randomly initialized input vector with respect to the loss function: 
 $$
 C(x) = \frac{1}{2} \Vert y_{goal} - y(x) \Vert^2
 + \lambda \Vert x_{mimic} - x \Vert^2
 $$  
-where $x$ is the input vector, $y_{goal}$ is the label output we desire, $x_{mimic}$ is the apperance we seek to mimic, and $y(x)$ is the output of the classifier. $\lambda \in [0,\infty)$ is a hyperparameter that is typically set to 0.05 - the larger the value, the more we want to prioritize the appearance of the input. 
+where $x$ is the input vector, $y_{goal}$ is the label output we desire, $x_{mimic}$ is the appearance we seek to mimic, and $y(x)$ is the output of the classifier. $\lambda \in [0,\infty)$ is a hyperparameter that is typically set to 0.05 - the larger the value, the more we want to prioritize the appearance of the input. 
 
 \subsection{Persistent Homology}
 
 \begin{figure*}
     \centering
     \includegraphics[scale=0.55]{figures/pers_hom_example.jpg}
-    \caption{The gradual thickening of a point cloud in $\mathbb{R}^2$ and the 1-dim Persistence Diagram. \\
-    Figure from https://medium.com/analytics-vidhya/topological-data-analysis-w-scikit-tda-891a201665d8}
+    \caption{The gradual thickening of a point cloud in $\mathbb{R}^2$ and the 1-dim Persistence Diagram.}
     \label{fig:pers_hom_example}
 \end{figure*}
 
@@ -137,23 +142,78 @@ Intuitively, for 0-D persistent homology in Euclidean space, we are primarily fo
 
 We do something very similar for 1-D persistent homology, where we still consider growing balls around each point, except that time time rather than tracking the birth and death of connected components, we track the birth and death of loops instead. For an example of the \v Cech complex of a given point cloud as the radius grows, see Figure \ref{fig:pers_hom_example}. 
 
-\todo{expand on these explanations in a more rigorous way, perhaps with some diagrams}
 
 \section{Methods}
 
 \subsection{Dataset and Setup}
-We have adopted the popular benchmark image classification dataset MNIST for our experiments. It consists of 60000 training images and 10000 testing images. Each of the digits, ranging from 0 to 9, represents one-tenth of the data in the dataset. In general, a very simple feedforward neural network, under relatively little training (e.g. 10 epochs) could achieve a testing accuracy of around 95 percent in this dataset. 
+We have adopted the popular benchmark image classification dataset MNIST for our experiments. It consists of 60000 training images and 10000 testing images. Each of the digits, ranging from 0 to 9, represents one-tenth of the data in the dataset. In general, a very simple feed-forward neural network, under relatively little training (e.g. 10 epochs) could achieve a testing accuracy of around 95 percent in this dataset. 
 
 It is worth noting that the "victim" neural net in our experiments is a fully connected multi-layer neural network. If one is to repeat this work with a convolutional neural network, we expect that the adversarial images produced may yield persistence diagrams that differ from ours.
 
 \subsection{Adversarial Noise}
-We first performed adversarial 
+We first performed adversarial image generation using the FGSM method outlined above, adopting and modifying code from a tutorial available on the PyTorch website \url{https://pytorch.org/tutorials/beginner/fgsm\_tutorial.html}. A random sample of the generated adversarial images are displayed in Figure \ref{fig:adversarialgenerated}. Several characteristics are of note: 
+\begin{itemize}
+    \item[1)] 
+    Even with very small, visually imperceptible perturbations (e.g. $\epsilon = 0.05$) to the images, the network could be fooled. 
+    \item[2)]
+    As the noise levels become higher, the noises in the images become more apparent, with certain "patchy" patterns emerging (see Figure \ref{fig:adversarialgenerated}).   
+\end{itemize}
 
-\todo{ed}
+\subsection{0-D Persistent Homology}
+
+Given the visual "patchy" patterns of the adversarial images generated using FGSM, it is natural to consider a 0-D persistent homology analysis of the images, which tracks the birth and death of connected components. In Figure \ref{fig:persistenceAdv}, in the top figure we plot an example adversarial image side by side with its 0-D persistent homology diagram. While this is certainly interesting and useful, note that it is likely that the filtration diagram captured the a lot of the structure of the digit itself, which is very pronounced in the adversarial image. Since our interest mainly lies in the adversarial noise rather than the structure of the digit itself, in the middle row we filtered out the noise component of the adversarial image using a high-pass filter, so that the high frequency adversarial noisy components would be retained and the effect of the digit structure would be alleviated. As a control, we added gaussian white noise of similar L2 magnitude to the original image, and applied the same high-pass filter. Resulting plots of the corresponding filtration diagrams now show clear visually discernible patterns. In general, we observe that adversarial noises are more structured and thus has fewer points appearing on the persistence diagram, whereas i.i.d. gaussian noise is less structured, resulting in many more components and points. 
+
+\subsection{Statistical Testing}
+
+The above analysis, while promising and interesting, is of a visual and exploratory nature. We would like to potentially automate the testing of adversarial noise versus i.i.d. distributed Gaussian noise via a more objective procedure that could be automatically applied. In order to perform statistical testing, we need several ingredients. First, we need the "size" of the test, typically set at $0.05$. Second, we need a test statistic. There are many potentially interesting ways of picking this, and here we focus on a popular topological metric called the average lifetime. It represents the average lifetime of the connected components tracked. Last but not least, we need a null distribution of the test statistic. Here, we generate the null-distribution via a generative approach. We calculate the average lifetime of (say 100) different draws of the Gaussian noise, and then compare the actual adversarial noise that we obtain to that empirical distribution. If the average lifetime of the adversarial noise lies within the top 2.5 percent or bottom 2.5 percent of the empirical distribution, then we would reject the null hypothesis. In Figure \ref{fig:testing} below, we outline two example cases, where in the first case we failed to reject the null and in the second case we reject the null. 
+
+In trying this approach, it is found that the efficacy and robustness of this test largely depends on the sizes of the noise applied. If we manually adjust the variance parameter of the simulated Gaussian noise so that the L2 norm of the Gaussian noise in the null and the adversarial noise are matched exactly to several decimal points, then in general the test can pick up differences between the average lifetime of the Gaussian noises in the null distribution and the adversarial noises. 
+
+However, if the sizes of the noises are even slightly different, i.e. we test against Gaussian noises that have a variance parameter that differs from the null's variance parameter by just $0.01$, then the test often rejects the null hypothesis. This implies that the test would frequently result in false negatives if the variance parameter of the null distribution is not calibrated properly, since the average lifetime analysis would then be capturing the sizes of the noise in addition to the structure of the noise.  Note that in reality, we often do not know the appropriate noise level exactly and would have to estimate/guess the noise level, and some approximation error in the appropriate noise/variance level would be inevitable. This means that we would need to improve upon the false-negative accuracy of this test in future studies or have access to very accurate noise levels in order for this test to be useful in reality.
+
+
+
+\begin{figure*}[!htb]
+    
+	\centering
+	\subfloat[Adversarial Images generated from FGSM]{
+	\includegraphics[scale=0.5]{figures/adversarial.png}}
+
+	
+	\caption{A random sample of generated Adversarial images using FGSM. Each row represents a different noise level, with the labels before and after the perturbation noted. Generated by code adopted and modified from Pytorch FGSM tutorial.}
+	\label{fig:adversarialgenerated}
+\end{figure*}
+
+\begin{figure*}[!htb]
+    
+	\centering
+	\subfloat[Adversarial image]{
+	\includegraphics[scale=0.5]{figures/advimage.png}}\\
+	\vspace{-1.2em}
+	\subfloat[Adversarial Noise (obtained by applying high pass filter)]{
+	\includegraphics[scale=0.5]{figures/advnoise.png}}\\ 
+	\vspace{-1.2em}
+	\subfloat[Gaussian Noise (obtained by applying high pass filter)]{
+	\includegraphics[scale=0.5]{figures/newadv.png}}
+	\caption{ }
+	\label{fig:persistenceAdv}
+\end{figure*}
+
+\begin{figure*}[!htb]
+    
+	\centering
+	\subfloat[A case where we fail to reject the null]{
+	\includegraphics[scale=0.5]{figures/failrej.png}}\\ 
+	\vspace{-1.2em}
+	\subfloat[A case where we reject the null]{
+	\includegraphics[scale=0.5]{figures/reject.png}}
+	\caption{ }
+	\label{fig:testing}
+\end{figure*}
 
 \subsection{Targeted Attacks}
 
-In constrast to the FGSM, the process of generating a targeted adversarial image specifies exactly which label we want the pre-trained network to misclassify our image as - this is the $y_{goal}$ term in the loss function. We used Algorithm 1 to produce the targeted adversarial images.
+In contrast to the FGSM, the process of generating a targeted adversarial image specifies exactly which label we want the pre-trained network to misclassify our image as - this is the $y_{goal}$ term in the loss function. We used Algorithm 1 to produce the targeted adversarial images.
 
 \begin{algorithm}
 \caption{Generate targeted adv. image}
@@ -169,6 +229,7 @@ In constrast to the FGSM, the process of generating a targeted adversarial image
 \RETURN $x$
 \end{algorithmic}
 \end{algorithm}
+
 
 Then, we transform the images into a 3D point cloud where the $x$ and $y$ coordinates correspond to the row and column of the pixel, respectively, and the $z$ value is brightness of the pixel. The $x,y$ values are then normalized so that the point cloud exists inside the unit cube since the brightness values are pre-normalized from the data set. 
 
@@ -207,13 +268,11 @@ This array of points is then inputted into Ripser where the 0 and 1-dim persiste
 
 \section{Results}
 
-From our experiments, we found that
-\todo{add summary of results}
+From our experiments, we found that there is a noticeable visual difference between the topological properties of adversarial images, their original counterparts, and noise-added variants. For both the untargeted and targeted methods of generating adversarial images, we observe that the resulting images tend to preserve many of the topological structures of the original images. To us, this serves as a visual indicator that there is something inherently different that sets the adversarial noise apart from standard i.i.d gaussian noise. 
 
-\todo{ed adds paragraph on his work}
+Figure \ref{fig:persistenceAdv} provides a sample for what the 0-D persistence diagrams pick up in comparing the adversarial image, the adversarial noise and the gaussian noise. It is clear in this case (and in general) that in the 0-D persistence diagram the adversarial noise show a sparser pattern and are closer to the original when compared to i.i.d. gaussian noise.  While this is of a more visual nature, Figure \ref{fig:testing} provides two plots that illustrate the statistical testing approach we adopted.  We ran this test multiple times and observed that for the vast majority of trials, the test results in rejection of the null, regardless of whether the noise is Gaussian or adversarial, mainly because the test is sensitive to the noise level of the null.
 
-Figure \ref{fig:targetedcomparison} depicts the differences between the persistence diagrams the targeted adversarial image and the other classes of images we are interested in. Immediately one notices the clumps of points in the adversarial and noisy 1-D persistence diagrams that are absent in the diagram of the original image. There is also a qualitative difference between the shape of the clumps in the adversarial and noisy images - the clumps appear to be similarly cone-shaped but differ in size. One could imagine that the size of the clumps in the noisy image can be controlled by adjusting the standard deviation of the added noise, and this may in fact be the case. \todo{find references about persistence diagrams of gaussian noise}
-% ^this seems to be true based on my experimentation
+Figure \ref{fig:targetedcomparison} depicts the differences between the persistence diagrams the targeted adversarial image and the other classes of images we are interested in. Immediately one notices the clumps of points in the adversarial and noisy 1-D persistence diagrams that are absent in the diagram of the original image. There is also a qualitative difference between the shape of the clumps in the adversarial and noisy images - the clumps appear to be similarly cone-shaped but differ in size. One could imagine that the size of the clumps in the noisy image can be controlled by adjusting the standard deviation of the added noise, and this may in fact be the case.
 
 Perhaps more interestingly, the persistence diagram of the adversarial image appears to contain more features of the original image whereas the noise-added image appears to have "lost" many features. Here, we use features in a very general sense to discuss the appearance of the 1-D persistence diagrams. This may seem like an obvious difference as during the process of generating the adversarial image there is an incentive to mimic the original image; however, it is not immediately obvious that the inclusion of adversarial perturbations should not alter the 1-D homology of the image.
 

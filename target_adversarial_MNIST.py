@@ -11,7 +11,7 @@ from persim import plot_diagrams
 MIMIC = 3
 TARGET = 6
 MAXDIM = 1
-SIGMA = np.sqrt(0.05)
+SIGMA = np.sqrt(0.001)
 
 with open('network/trained_network.pkl', 'rb') as f:
     u = pickle._Unpickler(f)
